@@ -1,13 +1,14 @@
 import os
 import sys
+import numpy as np
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import r2_score
 from src.MLproject.exception import CustomException
 from src.MLproject.logger import logging 
 import pandas as pd
 import pymysql 
 from dotenv import load_dotenv
 import pickle
+from sklearn.metrics import r2_score,mean_squared_error,mean_absolute_error
 load_dotenv()
 
 host=os.getenv("host")
@@ -35,6 +36,16 @@ def save_object(file_path,obj):
         os.makedirs(dir_path,exist_ok=True)
         with open(file_path,"wb") as file_obj:
             pickle.dump(obj,file_obj)
+    except Exception as e:
+        raise CustomException(e,sys)
+
+
+def eval_metrics(actual,pred):
+    try:
+        rmse=np.sqrt(mean_squared_error(actual,pred))
+        mae=mean_absolute_error(actual,pred)
+        r2=r2_score(actual,pred)
+        return rmse,mae,r2
     except Exception as e:
         raise CustomException(e,sys)
 
